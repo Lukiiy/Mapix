@@ -27,12 +27,8 @@ public final class BukkitWorldAdapter implements WorldAdapter<World> {
 
     @Override
     public boolean unload(World world) {
-        world.getPlayers().forEach(p -> p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation()));
+        world.getPlayers().forEach(p -> p.teleport(Bukkit.getWorlds().getFirst().getSpawnLocation()));
 
         return Bukkit.unloadWorld(world, false);
-    }
-
-    public Location getLocation(World world, Position position) {
-        return new Location(world, position.getX(), position.getY(), position.getZ(), position.getYaw(), position.getPitch());
     }
 }
