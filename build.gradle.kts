@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    java
     id("com.gradleup.shadow") version "9.4.2"
 }
 
@@ -10,13 +10,22 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    implementation(files("lib/mapling.jar"))
 }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        mergeServiceFiles()
+        minimize()
+    }
+
     build {
         dependsOn(shadowJar)
     }
