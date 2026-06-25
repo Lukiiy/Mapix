@@ -1,7 +1,6 @@
 package me.lukiiy.mapix;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -9,8 +8,11 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Item {
@@ -34,5 +36,13 @@ public class Item {
 
     public static boolean isEditorItem(ItemStack itemStack) {
         return itemStack.getPersistentDataContainer().has(KEY);
+    }
+
+    public static void applyAll(PlayerInventory inventory) {
+        inventory.setItem(0, POSITION_SELECTOR);
+    }
+
+    public static void removeAll(PlayerInventory inventory) {
+        Arrays.stream(inventory.getContents()).filter(Objects::nonNull).filter(Item::isEditorItem).forEach(inventory::remove);
     }
 }

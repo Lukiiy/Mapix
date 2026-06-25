@@ -68,7 +68,7 @@ public class SessionManager {
                 p.sendMessage(Component.text("Session saved.").color(NamedTextColor.GREEN));
                 p.teleport(fallback);
 
-                // TODO - Remove kit
+                Item.removeAll(p.getInventory());
                 playerState.remove(p);
             });
 
@@ -115,7 +115,7 @@ public class SessionManager {
         player.setFlying(true);
         player.showBossBar(session.bar());
 
-        // TODO - Apply kit
+        Item.applyAll(player.getInventory());
     }
 
     public void exit(Player player, boolean fullQuit) {
@@ -123,7 +123,7 @@ public class SessionManager {
                 .filter(s -> s.world().getHandle() != null && s.world().getHandle() == player.getWorld())
                 .findFirst().ifPresent(session -> player.hideBossBar(session.bar()));
 
-        // TODO - Remove kit
+        Item.removeAll(player.getInventory());
 
         if (fullQuit) playerState.remove(player);
     }
