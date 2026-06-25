@@ -1,0 +1,38 @@
+package me.lukiiy.mapix;
+
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.function.Consumer;
+
+public class Item {
+    public static final NamespacedKey KEY = new NamespacedKey(Mapix.getInstance(), "item");
+
+    public static final ItemStack POSITION_SELECTOR = create(Material.BLAZE_ROD, i -> {
+        i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
+        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Position Selector").color(NamedTextColor.YELLOW));
+        i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        i.addEnchantment(Enchantment.EFFICIENCY, 1);
+    });
+
+    private static ItemStack create(Material material, Consumer<ItemStack> builder) {
+        ItemStack item = ItemStack.of(material);
+
+        builder.accept(item);
+        item.editPersistentDataContainer(c -> c.set(KEY, PersistentDataType.BOOLEAN, true));
+
+        return item;
+    }
+
+    public static boolean isEditorItem(ItemStack itemStack) {
+        return itemStack.getPersistentDataContainer().has(KEY);
+    }
+}
