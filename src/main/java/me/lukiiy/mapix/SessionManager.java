@@ -24,18 +24,16 @@ public class SessionManager {
     private final Map<String, EditSession> sessions = new LinkedHashMap<>();
     private final Map<Player, PlayerEditState> playerState = new WeakHashMap<>();
 
-    public OpenResult open(String id, Player player) {
+    public void open(String id, Player player) {
         if (sessions.containsKey(id)) {
             EditSession session = sessions.get(id);
-
             if (session.world().getHandle() != null) enter(player, session);
 
-            return OpenResult.ALREADY_OPEN;
+            return;
         }
 
         try {
             var managedWorld = Mapix.getInstance().getWorldManager().load(id);
-
             BossBar bar = BossBar.bossBar(Component.text("Editing ").color(NamedTextColor.GRAY).append(Component.text(id).color(NamedTextColor.YELLOW)), 1f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
             EditSession session = new EditSession(managedWorld, new ArrayList<>(), bar);
 
@@ -44,12 +42,8 @@ public class SessionManager {
             enter(player, session);
 
             Mapix.getInstance().getLogger().info("Opened edit session: " + id);
-
-            return OpenResult.OPENED;
         } catch (Exception e) {
             Mapix.getInstance().getLogger().warning("Failed to open session '" + id + "': " + e.getMessage());
-
-            return OpenResult.ERROR;
         }
     }
 
@@ -299,11 +293,5 @@ public class SessionManager {
 
     private PlayerEditState getState(Player player) {
         return playerState.computeIfAbsent(player, a -> new PlayerEditState());
-    }
-
-    public enum OpenResult { // TOOD - A throw would be better instead of just doing what the original version had?
-        OPENED,
-        ALREADY_OPEN,
-        ERROR
     }
 }
