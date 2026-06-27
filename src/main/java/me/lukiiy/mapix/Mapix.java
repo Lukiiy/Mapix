@@ -20,7 +20,7 @@ public final class Mapix extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new Listen(), this);
 
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, it -> it.registrar().register(new Command().build(), "Mapix's main command."));
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, it -> it.registrar().register(new Cmd().build(), "Mapix's main command."));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package me.lukiiy.mapix;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class Command { // TODO !!!
+public class Cmd { // TODO !!!
     public static final CommandSyntaxException NON_PLAYER = error("This command can only be used by in-game players.");
     public static final CommandSyntaxException NOT_IN_SESSION = error("Not in an editing session.");
     // TODO rework messages?
@@ -36,14 +37,14 @@ public class Command { // TODO !!!
 
                                     Mapix.getInstance().getSessionManager().open(StringArgumentType.getString(it, "id"), player);
 
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("save")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
                             handleSave(player, null);
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         })
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests((it, b) -> {
@@ -55,7 +56,7 @@ public class Command { // TODO !!!
                                     if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
                                     handleSave(player, StringArgumentType.getString(it, "id"));
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("list")
                         .executes(it -> {
@@ -65,21 +66,21 @@ public class Command { // TODO !!!
                             if (ids.isEmpty()) throw error("No active sessions.");
 
                             player.sendMessage(Component.text("Active: " + String.join(", ", ids)).color(NamedTextColor.YELLOW));
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("pos1")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
                             handleSetPosition(player, true);
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("pos2")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
                             handleSetPosition(player, false);
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("clearpos")
                         .executes(it -> {
@@ -88,7 +89,7 @@ public class Command { // TODO !!!
                             Mapix.getInstance().getSessionManager().clearPosition(player);
                             player.sendMessage(Component.text("Positions cleared!").color(NamedTextColor.GREEN));
 
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("plips")
                         .executes(it -> {
@@ -100,7 +101,7 @@ public class Command { // TODO !!!
                             Mapix.getInstance().getSessionManager().reloadPlips(managedWorld);
                             player.sendMessage(Component.text("Plips reloaded.").color(NamedTextColor.GREEN));
 
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("info")
                         .executes(it -> {
@@ -118,7 +119,7 @@ public class Command { // TODO !!!
                                 player.sendMessage(Component.text("Second position: ").color(NamedTextColor.BLUE).append(Component.text(formatLocation(sessionManager.getSecondPosition(player)))));
                             }
 
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(buildGroup())
                 .executes(ctx -> {
@@ -136,7 +137,7 @@ public class Command { // TODO !!!
                             "info", "Display session info"
                     ).forEach((sub, desc) -> ctx.getSource().getSender().sendMessage(Component.text(sub).append(Component.text(" - " + desc).color(NamedTextColor.GRAY))));
 
-                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                    return Command.SINGLE_SUCCESS;
                 }).build();
     }
 
@@ -154,7 +155,7 @@ public class Command { // TODO !!!
 
                             player.sendMessage(Component.text("Groups: " + String.join(", ", groups)));
 
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("create")
                         .then(Commands.argument("name", StringArgumentType.word())
@@ -173,7 +174,7 @@ public class Command { // TODO !!!
                                         player.sendMessage(Component.text("Created group '" + name + "'.").color(NamedTextColor.GREEN));
                                     } else throw error("Group '" + name + "' already exists.");
 
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("delete")
                         .then(Commands.argument("name", StringArgumentType.word())
@@ -193,7 +194,7 @@ public class Command { // TODO !!!
                                         player.sendMessage(Component.text("Deleted '" + name + "'.").color(NamedTextColor.RED));
                                     } else throw error("Group '" + name + "' not found.");
 
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("select")
                         .then(Commands.argument("name", StringArgumentType.word())
@@ -212,7 +213,7 @@ public class Command { // TODO !!!
                                     sessionManager.selectGroup(player, name);
                                     player.sendMessage(Component.text("Selected: " + name).color(NamedTextColor.GREEN));
 
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("add")
                         .executes(it -> {
@@ -232,7 +233,7 @@ public class Command { // TODO !!!
                             if (loc == null) loc = player.getLocation();
 
                             player.sendMessage(sessionManager.addToGroup(managedWorld, group, loc) ? Component.text("Added to '" + group + "'.").color(NamedTextColor.GREEN) : Component.text("Failed to add location.").color(NamedTextColor.RED));
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("remove")
                         .then(Commands.argument("index", IntegerArgumentType.integer(0))
@@ -249,21 +250,21 @@ public class Command { // TODO !!!
                                     if (group == null) throw error("No group selected.");
 
                                     player.sendMessage(sessionManager.removeFromGroup(managedWorld, group, index) ? Component.text("Removed [" + index + "] from '" + group + "'.").color(NamedTextColor.GREEN) : Component.text("Index " + index + " out of range.").color(NamedTextColor.RED));
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("scroll")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
                             groupScroll(player, 1);
-                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                            return Command.SINGLE_SUCCESS;
                         })
                         .then(Commands.argument("delta", IntegerArgumentType.integer())
                                 .executes(it -> {
                                     if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
                                     groupScroll(player, IntegerArgumentType.getInteger(it, "delta"));
-                                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                                    return Command.SINGLE_SUCCESS;
                                 })));
     }
 
@@ -282,7 +283,7 @@ public class Command { // TODO !!!
         }
 
         sessionManager.save(id);
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+        return Command.SINGLE_SUCCESS;
     }
 
     private int handleSetPosition(Player player, boolean first) throws CommandSyntaxException {
@@ -291,14 +292,14 @@ public class Command { // TODO !!!
         if (sm.mapFor(player) == null) throw NOT_IN_SESSION;
 
         sm.setPos(player, player.getLocation().toCenterLocation(), first);
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+        return Command.SINGLE_SUCCESS;
     }
 
     private int groupScroll(Player player, int delta) {
         String group = Mapix.getInstance().getSessionManager().scrollGroup(player, delta);
 
         player.sendActionBar(group != null ? Component.text("Group: ").color(NamedTextColor.GRAY).append(Component.text(group).color(NamedTextColor.GREEN)) : Component.text("No groups.").color(NamedTextColor.RED));
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+        return Command.SINGLE_SUCCESS;
     }
 
     private CompletableFuture<Suggestions> suggestGroups(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
