@@ -29,7 +29,7 @@ public class Cmd { // TODO !!!
 
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("mapix")
-                .requires(it -> it.getSender() instanceof Player player && player.hasPermission("mapeditor.edit"))
+                .requires(it -> it.getSender() instanceof Player player && player.hasPermission("mapix.edit"))
                 .then(Commands.literal("tp")
                         .then(Commands.argument("id", new MapIdArgument())
                                 .executes(it -> {
