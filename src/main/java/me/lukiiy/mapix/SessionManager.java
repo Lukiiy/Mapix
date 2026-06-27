@@ -25,6 +25,8 @@ public class SessionManager {
     private final Map<Player, PlayerEditState> playerState = new WeakHashMap<>();
 
     public void open(String id, Player player) {
+        Mapix mapix = Mapix.getInstance();
+
         if (sessions.containsKey(id)) {
             EditSession session = sessions.get(id);
             if (session.world().getHandle() != null) enter(player, session);
@@ -33,7 +35,7 @@ public class SessionManager {
         }
 
         try {
-            var managedWorld = Mapix.getInstance().getWorldManager().load(id);
+            var managedWorld = mapix.getWorldManager().load(id);
             BossBar bar = BossBar.bossBar(Component.text("Editing ").color(NamedTextColor.GRAY).append(Component.text(id).color(NamedTextColor.YELLOW)), 1f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
             EditSession session = new EditSession(managedWorld, new ArrayList<>(), bar);
 
@@ -41,9 +43,10 @@ public class SessionManager {
             spawnPlips(session);
             enter(player, session);
 
-            Mapix.getInstance().getLogger().info("Opened edit session: " + id);
+            mapix.getLogger().info("Opened edit session: " + id);
         } catch (Exception e) {
-            Mapix.getInstance().getLogger().warning("Failed to open session '" + id + "': " + e.getMessage());
+            player.sendMessage(Component.text("Failed to initialize the session!").color(NamedTextColor.RED));
+            mapix.getLogger().warning("Failed to open session '" + id + "': " + e.getMessage());
         }
     }
 
@@ -110,6 +113,7 @@ public class SessionManager {
         player.showBossBar(session.bar());
 
         Item.applyAll(player.getInventory());
+        player.sendMessage(Component.text("Teleporting to session " + session.world().getHandle().getName()).color(NamedTextColor.GREEN));
     }
 
     public void exit(Player player, boolean fullQuit) {
