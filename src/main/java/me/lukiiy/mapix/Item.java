@@ -22,7 +22,7 @@ public class Item {
         i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
         i.setData(DataComponentTypes.ITEM_NAME, Component.text("Position Selector").color(NamedTextColor.YELLOW));
         i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        i.addEnchantment(Enchantment.EFFICIENCY, 1);
+        i.addUnsafeEnchantment(Enchantment.EFFICIENCY, 1);
     });
 
     private static ItemStack create(Material material, Consumer<ItemStack> builder) {
