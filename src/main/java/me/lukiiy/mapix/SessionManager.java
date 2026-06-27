@@ -230,7 +230,7 @@ public class SessionManager {
 
         positions.add(Utils.toPos(loc));
         managedWorld.getData().section("groups").set(group, positions);
-        refreshPlips(managedWorld);
+        reloadPlips(managedWorld);
 
         return true;
     }
@@ -241,12 +241,12 @@ public class SessionManager {
 
         positions.remove(index);
         managedWorld.getData().section("groups").set(group, positions);
-        refreshPlips(managedWorld);
+        reloadPlips(managedWorld);
 
         return true;
     }
 
-    public void refreshPlips(ManagedWorld<World> managedWorld) {
+    public void reloadPlips(ManagedWorld<World> managedWorld) {
         sessions.values().stream().filter(s -> s.world() == managedWorld)
                 .findFirst().ifPresent(s -> {
                     removePlips(s);
