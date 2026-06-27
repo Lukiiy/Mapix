@@ -30,7 +30,7 @@ public class Command { // TODO !!!
         return Commands.literal("mapix")
                 .requires(it -> it.getSender() instanceof Player player && player.hasPermission("mapeditor.edit"))
                 .then(Commands.literal("tp")
-                        .then(Commands.argument("id", StringArgumentType.word())
+                        .then(Commands.argument("id", new MapIdArgument())
                                 .executes(it -> {
                                     if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
