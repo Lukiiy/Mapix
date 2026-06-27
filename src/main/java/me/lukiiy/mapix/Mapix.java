@@ -7,12 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+
 public final class Mapix extends JavaPlugin {
-    private final WorldManager<World> worldManager = new WorldManager<>(Bukkit.getWorldContainer(), new BukkitWorldAdapter(), new TomlWorldDataStore());
+    private final File worldsDir = new File(Bukkit.getWorldContainer(), "maps");
+    private final WorldManager<World> worldManager = new WorldManager<>(worldsDir, new BukkitWorldAdapter(), new TomlWorldDataStore());
     private final SessionManager sessionManager = new SessionManager();
 
     @Override
     public void onEnable() {
+        if (!worldsDir.exists()) worldsDir.mkdirs();
+
         getServer().getPluginManager().registerEvents(new Listen(), this);
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, it -> it.registrar().register(new Command().build(), "Mapix's main command."));
@@ -33,5 +38,9 @@ public final class Mapix extends JavaPlugin {
 
     public SessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    public File getWorldsDir() {
+        return worldsDir;
     }
 }
