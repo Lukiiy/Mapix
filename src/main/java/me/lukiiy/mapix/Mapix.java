@@ -1,5 +1,6 @@
 package me.lukiiy.mapix;
 
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import me.lukiiy.mapling.WorldManager;
 import me.lukiiy.mapling.provided.TomlWorldDataStore;
 import org.bukkit.Bukkit;
@@ -13,6 +14,8 @@ public final class Mapix extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Listen(), this);
+
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, it -> it.registrar().register(new Command().build(), "Mapix's main command."));
     }
 
     @Override
