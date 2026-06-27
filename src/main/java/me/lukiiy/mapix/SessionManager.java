@@ -139,7 +139,7 @@ public class SessionManager {
             state.second = loc;
         }
 
-        player.sendActionBar(Component.text("Position " + (first ? "1" : "2") + " set!").color(first ? FIRST_POSITION : SECOND_POSITION));
+        player.sendMessage(Component.text("Position " + (first ? "1" : "2") + " set! (" + loc.blockX() + " " + loc.blockY() + " " + loc.blockZ() + ")").color(first ? FIRST_POSITION : SECOND_POSITION));
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, .25f, 1);
     }
 
