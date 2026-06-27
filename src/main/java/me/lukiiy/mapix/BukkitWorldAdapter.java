@@ -1,9 +1,7 @@
 package me.lukiiy.mapix;
 
-import me.lukiiy.mapling.Position;
 import me.lukiiy.mapling.WorldAdapter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -15,7 +13,11 @@ public final class BukkitWorldAdapter implements WorldAdapter<World> {
         String name = folder.getPath().replace(File.separator, "/");
 
         World existing = Bukkit.getWorld(name);
-        return existing != null ? existing : new WorldCreator(name).createWorld();
+        if (existing != null) return existing;
+
+        if (!new File(folder, "level.dat").exists()) throw new IllegalArgumentException("No valid world at: " + folder.getPath());
+
+        return new WorldCreator(name).createWorld();
     }
 
     @Override
@@ -27,6 +29,6 @@ public final class BukkitWorldAdapter implements WorldAdapter<World> {
     public boolean unload(World world) {
         world.getPlayers().forEach(p -> p.teleport(Bukkit.getWorlds().getFirst().getSpawnLocation()));
 
-        return Bukkit.unloadWorld(world, false);
+        return Bukkit.unloadWorld(world, true);
     }
 }
