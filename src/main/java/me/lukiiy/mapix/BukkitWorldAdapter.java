@@ -12,12 +12,10 @@ import java.io.File;
 public final class BukkitWorldAdapter implements WorldAdapter<World> {
     @Override
     public World load(File folder) {
-        String name = folder.getName();
+        String name = folder.getPath().replace(File.separator, "/");
 
         World existing = Bukkit.getWorld(name);
-        if (existing != null) return existing;
-
-        return new WorldCreator(name).createWorld();
+        return existing != null ? existing : new WorldCreator(name).createWorld();
     }
 
     @Override
