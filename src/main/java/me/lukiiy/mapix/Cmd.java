@@ -112,9 +112,11 @@ public class Cmd { // TODO !!!
 
                             player.sendMessage(Component.text("Session: " + (managedWorld != null ? managedWorld.getId() : "none")).color(NamedTextColor.YELLOW));
 
+                            String group = sessionManager.getSelectedGroup(player);
+
                             if (managedWorld != null) {
                                 player.sendMessage(Component.text("Groups: ").color(NamedTextColor.GREEN).append(Component.text(String.join(", ", sessionManager.getGroups(managedWorld)))));
-                                player.sendMessage(Component.text("Selected group: ").color(NamedTextColor.GREEN).append(Component.text(sessionManager.getSelectedGroup(player)))); // TODO arrow
+                                if (group != null && !group.isBlank()) player.sendMessage(Component.text("Selected group: ").color(NamedTextColor.GREEN).append(Component.text(group))); // TODO arrow
                                 player.sendMessage(Component.text("First position: ").color(NamedTextColor.BLUE).append(Component.text(formatLocation(sessionManager.getFirstPosition(player)))));
                                 player.sendMessage(Component.text("Second position: ").color(NamedTextColor.BLUE).append(Component.text(formatLocation(sessionManager.getSecondPosition(player)))));
                             }
