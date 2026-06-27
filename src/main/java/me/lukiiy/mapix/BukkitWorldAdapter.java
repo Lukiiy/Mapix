@@ -10,8 +10,7 @@ import java.io.File;
 public final class BukkitWorldAdapter implements WorldAdapter<World> {
     @Override
     public World load(File folder) {
-        String name = folder.getPath().replace(File.separator, "/");
-
+        String name = folder.getName();
         World existing = Bukkit.getWorld(name);
         if (existing != null) return existing;
 

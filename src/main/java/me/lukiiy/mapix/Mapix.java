@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
 public final class Mapix extends JavaPlugin {
-    private final File worldsDir = new File(Bukkit.getWorldContainer(), "maps");
+    private final File worldsDir = Bukkit.getWorldContainer();
     private final WorldManager<World> worldManager = new WorldManager<>(worldsDir, new BukkitWorldAdapter(), new TomlWorldDataStore());
     private final SessionManager sessionManager = new SessionManager();
 
