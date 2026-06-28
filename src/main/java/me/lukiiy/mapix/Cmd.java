@@ -128,7 +128,7 @@ public class Cmd { // TODO !!!
                     ctx.getSource().getSender().sendMessage(Component.text("Subcommands:").color(NamedTextColor.LIGHT_PURPLE));
 
                     Map.of(
-                            "tp <id>", "Load a map for editing",
+                            "edit <id>", "Load a map for editing",
                             "save [id]", "Save & unload",
                             "list", "List active sessions",
                             "pos1", "Set first selection position",
