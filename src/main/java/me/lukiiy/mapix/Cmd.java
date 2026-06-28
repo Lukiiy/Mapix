@@ -16,30 +16,39 @@ import io.papermc.paper.command.brigadier.MessageComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 public class Cmd { // TODO !!!
     public static final CommandSyntaxException NON_PLAYER = error("This command can only be used by in-game players.");
     public static final CommandSyntaxException NOT_IN_SESSION = error("Not in an editing session.");
     // TODO rework messages?
 
+    private final Predicate<CommandSender> inSession = sender -> {
+        if (!(sender instanceof Player p)) return false;
+
+        return Mapix.getInstance().getSessionManager().mapFor(p) != null;
+    };
+
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("mapix")
                 .requires(it -> it.getSender() instanceof Player player && player.hasPermission("mapix.edit"))
-                .then(Commands.literal("tp")
+                .then(Commands.literal("edit")
                         .then(Commands.argument("id", new MapIdArgument())
                                 .executes(it -> {
                                     if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
-                                    Mapix.getInstance().getSessionManager().open(StringArgumentType.getString(it, "id"), player);
+                                    Mapix.getInstance().getSessionManager().edit(StringArgumentType.getString(it, "id"), player);
 
                                     return Command.SINGLE_SUCCESS;
                                 })))
                 .then(Commands.literal("save")
+                        .requires(it -> inSession.test(it.getSender()))
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
@@ -69,6 +78,7 @@ public class Cmd { // TODO !!!
                             return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("pos1")
+                        .requires(it -> inSession.test(it.getSender()))
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
@@ -76,6 +86,7 @@ public class Cmd { // TODO !!!
                             return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("pos2")
+                        .requires(it -> inSession.test(it.getSender()))
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
@@ -83,6 +94,7 @@ public class Cmd { // TODO !!!
                             return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("clearpos")
+                        .requires(it -> inSession.test(it.getSender()))
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
@@ -92,6 +104,7 @@ public class Cmd { // TODO !!!
                             return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("plips")
+                        .requires(it -> inSession.test(it.getSender()))
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
@@ -104,6 +117,7 @@ public class Cmd { // TODO !!!
                             return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("info")
+                        .requires(it -> inSession.test(it.getSender()))
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
@@ -145,6 +159,7 @@ public class Cmd { // TODO !!!
 
     private LiteralArgumentBuilder<CommandSourceStack> buildGroup() {
         return Commands.literal("group")
+                .requires(it -> inSession.test(it.getSender()))
                 .then(Commands.literal("list")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
