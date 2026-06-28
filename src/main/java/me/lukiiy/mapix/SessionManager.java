@@ -24,7 +24,7 @@ public class SessionManager {
     private final Map<String, EditSession> sessions = new LinkedHashMap<>();
     private final Map<Player, PlayerEditState> playerState = new WeakHashMap<>();
 
-    public void open(String id, Player player) {
+    public void edit(String id, Player player) {
         Mapix mapix = Mapix.getInstance();
 
         if (sessions.containsKey(id)) {
@@ -263,20 +263,15 @@ public class SessionManager {
             List<Position> positions = getGroupPositions(session.world(), group);
 
             IntStream.range(0, positions.size()).forEach(i -> {
-                Location loc = Utils.toLoc(world, positions.get(i));
+                Location base = Utils.toLoc(world, positions.get(i));
+                boolean blocked = !base.getBlock().isPassable();
 
-                final int idx = i;
-                final String name = group;
+                Component text = Component.text(group).color(NamedTextColor.WHITE).appendSpace().append(Component.text("[" + i + "]").color(NamedTextColor.YELLOW));
+                if (blocked) text = text.append(Component.newline()).append(Component.text("↓").color(NamedTextColor.GRAY));
 
-                var textDisplay = world.spawn(loc, TextDisplay.class, e -> {
-                    boolean blocked = !loc.getBlock().isEmpty();
-                    if (blocked) e.teleport(loc.clone().add(0, 1, 0));
-
-                    Component text = Component.text(name).color(NamedTextColor.WHITE).appendSpace().append(Component.text("[" + idx + "]").color(NamedTextColor.YELLOW));
-
-                    if (blocked) text = text.append(Component.newline()).append(Component.text("↓").color(NamedTextColor.GRAY));
-
-                    e.text(text);
+                final Component fText = text;
+                TextDisplay display = world.spawn(blocked ? base.clone().add(0, 1, 0) : base, TextDisplay.class, e -> {
+                    e.text(fText);
                     e.setPersistent(false);
                     e.setDefaultBackground(false);
                     e.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
@@ -285,7 +280,7 @@ public class SessionManager {
                     e.setViewRange(.25f);
                 });
 
-                session.plips().add(textDisplay);
+                session.plips().add(display);
             });
         });
     }
