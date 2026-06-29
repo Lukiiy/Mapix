@@ -18,7 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,10 +27,24 @@ public class Cmd { // TODO !!!
     public static final CommandSyntaxException NOT_IN_SESSION = error("Not in an editing session.");
     // TODO rework messages?
 
+    private static final LinkedHashMap<String, String> HELP = new LinkedHashMap<>();
+
+    static {
+        HELP.put("edit <id>", "Load a map for editing");
+        HELP.put("save [id]", "Save & unload");
+        HELP.put("list", "List active sessions");
+        HELP.put("pos1", "Set first selection position");
+        HELP.put("pos2", "Set second selection position");
+        HELP.put("clearpos", "Clear both positions");
+        HELP.put("group <sub>", "Manage groups");
+        HELP.put("plips", "Refresh position markers");
+        HELP.put("info", "Display session info");
+    }
+
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("mapix")
                 .requires(it -> it.getSender() instanceof Player player && player.hasPermission("mapix.edit"))
-                .then(Commands.literal("tp")
+                .then(Commands.literal("edit")
                         .then(Commands.argument("id", new MapIdArgument())
                                 .executes(it -> {
                                     if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
@@ -124,21 +138,10 @@ public class Cmd { // TODO !!!
                             return Command.SINGLE_SUCCESS;
                         }))
                 .then(buildGroup())
-                .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage(Component.text("Subcommands:").color(NamedTextColor.LIGHT_PURPLE));
+                .executes(it -> {
+                    it.getSource().getSender().sendMessage(Component.text("Subcommands:").color(NamedTextColor.LIGHT_PURPLE));
 
-                    Map.of(
-                            "edit <id>", "Load a map for editing",
-                            "save [id]", "Save & unload",
-                            "list", "List active sessions",
-                            "pos1", "Set first selection position",
-                            "pos2", "Set second selection position",
-                            "clearpos", "Clear both positions",
-                            "group <sub>", "Manage positio groups",
-                            "plips", "Refresh position markers",
-                            "info", "Display session info"
-                    ).forEach((sub, desc) -> ctx.getSource().getSender().sendMessage(Component.text(sub).append(Component.text(" - " + desc).color(NamedTextColor.GRAY))));
-
+                    HELP.forEach((sub, desc) -> it.getSource().getSender().sendMessage(Component.text(sub).append(Component.text(" - " + desc).color(NamedTextColor.GRAY))));
                     return Command.SINGLE_SUCCESS;
                 }).build();
     }
