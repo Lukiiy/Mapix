@@ -7,7 +7,6 @@ import org.bukkit.WorldCreator;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -16,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 public final class BukkitWorldAdapter implements WorldAdapter<World> {
-    private final Map<String, File> sourceDirectory = new HashMap<>();
+    private final Map<String, File> sourceDirectories = new HashMap<>();
     private final Map<String, File> activeDirectories = new HashMap<>();
     private final Set<String> markedForSave = new HashSet<>();
 
@@ -38,7 +37,7 @@ public final class BukkitWorldAdapter implements WorldAdapter<World> {
 
         World world = new WorldCreator(name).createWorld();
 
-        sourceDirectory.put(name, folder);
+        sourceDirectories.put(name, folder);
         activeDirectories.put(name, copy);
         return world;
     }
@@ -55,7 +54,7 @@ public final class BukkitWorldAdapter implements WorldAdapter<World> {
 
         String name = world.getName();
         File copy = activeDirectories.remove(name);
-        File original = sourceDirectory.remove(name);
+        File original = sourceDirectories.remove(name);
 
         boolean saved = markedForSave.remove(name);
         boolean result = Bukkit.unloadWorld(world, false); // here due to locks
