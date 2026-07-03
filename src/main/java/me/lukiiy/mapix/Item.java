@@ -25,6 +25,18 @@ public class Item {
         i.addUnsafeEnchantment(Enchantment.EFFICIENCY, 1);
     });
 
+    public static final ItemStack GROUP_TOOL = create(Material.REDSTONE, i -> {
+        i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
+        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Group Tool").color(NamedTextColor.RED));
+        i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        i.addUnsafeEnchantment(Enchantment.EFFICIENCY, 1);
+    });
+
+    public static final ItemStack MENU = create(Material.NETHER_STAR, i -> {
+        i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
+        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Menu").color(NamedTextColor.RED));
+    });
+
     private static ItemStack create(Material material, Consumer<ItemStack> builder) {
         ItemStack item = ItemStack.of(material);
 
