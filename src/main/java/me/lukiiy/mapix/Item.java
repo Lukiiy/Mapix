@@ -21,15 +21,11 @@ public class Item {
     public static final ItemStack POSITION_SELECTOR = create(Material.BLAZE_ROD, i -> {
         i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
         i.setData(DataComponentTypes.ITEM_NAME, Component.text("Position Selector").color(NamedTextColor.YELLOW));
-        i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        i.addUnsafeEnchantment(Enchantment.EFFICIENCY, 1);
     });
 
     public static final ItemStack GROUP_TOOL = create(Material.REDSTONE, i -> {
         i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
         i.setData(DataComponentTypes.ITEM_NAME, Component.text("Group Tool").color(NamedTextColor.RED));
-        i.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        i.addUnsafeEnchantment(Enchantment.EFFICIENCY, 1);
     });
 
     public static final ItemStack MENU = create(Material.NETHER_STAR, i -> {
@@ -41,6 +37,7 @@ public class Item {
         ItemStack item = ItemStack.of(material);
 
         builder.accept(item);
+        item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
         item.editPersistentDataContainer(c -> c.set(KEY, PersistentDataType.BOOLEAN, true));
 
         return item;
