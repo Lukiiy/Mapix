@@ -7,5 +7,8 @@ public class PlayerEditState {
     public Location second;
 
     public String selectedGroup;
+    public SelectionMode selectionMode;
+
+    public boolean plips = true;
 }
 
