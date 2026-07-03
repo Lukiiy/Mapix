@@ -254,6 +254,22 @@ public class SessionManager {
                 });
     }
 
+    public void togglePlips(Player player) {
+        PlayerEditState state = getState(player);
+
+        state.plips = !state.plips;
+
+        var managedWorld = mapFor(player);
+        if (managedWorld == null) return;
+
+        World world = managedWorld.getHandle();
+        if (world == null) return;
+
+        sessions.values().stream().filter(s -> s.world() == managedWorld).findFirst().ifPresent(session -> session.plips().forEach(textDisplay -> {
+            if (state.plips) player.showEntity(Mapix.getInstance(), textDisplay); else player.hideEntity(Mapix.getInstance(), textDisplay);
+        }));
+    }
+
     // the cool thing :3
     private void spawnPlips(EditSession session) {
         var world = session.world().getHandle();
