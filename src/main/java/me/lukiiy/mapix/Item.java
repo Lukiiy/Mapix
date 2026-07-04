@@ -19,7 +19,10 @@ public class Item {
     public static final NamespacedKey KEY = new NamespacedKey(Mapix.getInstance(), "item");
 
     public static final ItemStack POSITION_SELECTOR = create(Material.BLAZE_ROD, i -> i.setData(DataComponentTypes.ITEM_NAME, Component.text("Position Selector").color(NamedTextColor.YELLOW)));
-    public static final ItemStack GROUP_TOOL = create(Material.REDSTONE, i -> i.setData(DataComponentTypes.ITEM_NAME, Component.text("Group Tool").color(NamedTextColor.RED)));
+    public static final ItemStack GROUP_TOOL = create(Material.PAPER, i -> {
+        i.setData(DataComponentTypes.ITEM_MODEL, NamespacedKey.minecraft("redstone"));
+        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Group Tool").color(NamedTextColor.RED));
+    });
     public static final ItemStack MENU = create(Material.NETHER_STAR, i -> i.setData(DataComponentTypes.ITEM_NAME, Component.text("Menu").color(NamedTextColor.AQUA)));
 
     private static ItemStack create(Material material, Consumer<ItemStack> builder) {
