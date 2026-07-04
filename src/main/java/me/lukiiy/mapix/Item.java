@@ -18,26 +18,16 @@ import java.util.function.Consumer;
 public class Item {
     public static final NamespacedKey KEY = new NamespacedKey(Mapix.getInstance(), "item");
 
-    public static final ItemStack POSITION_SELECTOR = create(Material.BLAZE_ROD, i -> {
-        i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
-        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Position Selector").color(NamedTextColor.YELLOW));
-    });
-
-    public static final ItemStack GROUP_TOOL = create(Material.REDSTONE, i -> {
-        i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
-        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Group Tool").color(NamedTextColor.RED));
-    });
-
-    public static final ItemStack MENU = create(Material.NETHER_STAR, i -> {
-        i.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
-        i.setData(DataComponentTypes.ITEM_NAME, Component.text("Menu").color(NamedTextColor.RED));
-    });
+    public static final ItemStack POSITION_SELECTOR = create(Material.BLAZE_ROD, i -> i.setData(DataComponentTypes.ITEM_NAME, Component.text("Position Selector").color(NamedTextColor.YELLOW)));
+    public static final ItemStack GROUP_TOOL = create(Material.REDSTONE, i -> i.setData(DataComponentTypes.ITEM_NAME, Component.text("Group Tool").color(NamedTextColor.RED)));
+    public static final ItemStack MENU = create(Material.NETHER_STAR, i -> i.setData(DataComponentTypes.ITEM_NAME, Component.text("Menu").color(NamedTextColor.AQUA)));
 
     private static ItemStack create(Material material, Consumer<ItemStack> builder) {
         ItemStack item = ItemStack.of(material);
 
         builder.accept(item);
         item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        item.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
         item.editPersistentDataContainer(c -> c.set(KEY, PersistentDataType.BOOLEAN, true));
 
         return item;
@@ -49,6 +39,8 @@ public class Item {
 
     public static void applyAll(PlayerInventory inventory) {
         inventory.setItem(0, POSITION_SELECTOR);
+        inventory.setItem(1, GROUP_TOOL);
+        inventory.setItem(2, MENU);
     }
 
     public static void removeAll(PlayerInventory inventory) {
