@@ -246,6 +246,26 @@ public class SessionManager {
         return true;
     }
 
+    public int nearestIndex(Player player, List<Position> positions) {
+        if (positions.isEmpty()) return -1;
+
+        Location loc = player.getLocation();
+        int best = 0;
+        double min = Double.MAX_VALUE;
+
+        for (int idx = 0; idx < positions.size(); idx++) {
+            Position p = positions.get(idx);
+
+            double distance = Math.pow(p.getX() - loc.getX(), 2) + Math.pow(p.getY() - loc.getY(), 2) + Math.pow(p.getZ() - loc.getZ(), 2);
+            if (distance < min) {
+                min = distance;
+                best = idx;
+            }
+        }
+
+        return best;
+    }
+
     public void reloadPlips(ManagedWorld<World> managedWorld) {
         sessions.values().stream().filter(s -> s.world() == managedWorld)
                 .findFirst().ifPresent(s -> {
@@ -306,7 +326,7 @@ public class SessionManager {
         session.plips().clear();
     }
 
-    private PlayerEditState getState(Player player) {
+    public PlayerEditState getState(Player player) {
         return playerState.computeIfAbsent(player, a -> new PlayerEditState());
     }
 }
