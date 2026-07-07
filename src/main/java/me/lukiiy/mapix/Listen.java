@@ -1,6 +1,8 @@
 package me.lukiiy.mapix;
 
-import org.bukkit.Location;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,12 +31,22 @@ public class Listen implements Listener {
 
         e.setCancelled(true);
 
+        boolean left = e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_AIR;
+        boolean right = e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR;
+        boolean shift = player.isSneaking();
+
         if (item.isSimilar(Item.POSITION_SELECTOR)) {
+            if (shift && right) {
+                sessionManager.clearPosition(player);
+                player.sendMessage(Component.text("Selection cleared.").color(NamedTextColor.GRAY));
+
+                return;
+            }
+
             if (e.getClickedBlock() == null) return;
+            sessionManager.setPos(player, e.getClickedBlock().getLocation().toCenterLocation(), left);
 
-            Location loc = e.getClickedBlock().getLocation().toCenterLocation();
-
-            sessionManager.setPos(player, loc, e.getAction() == Action.LEFT_CLICK_BLOCK);
+            return;
         }
     }
 
