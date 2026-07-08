@@ -7,7 +7,7 @@ public class PlayerEditState {
     public Location second;
 
     public String selectedGroup;
-    public SelectionMode selectionMode;
+    public SelectionMode selectionMode = SelectionMode.POINT;
 
     public boolean plips = true;
 }
