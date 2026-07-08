@@ -317,6 +317,10 @@ public class SessionManager {
                 });
 
                 session.plips().add(display);
+
+                playerState.forEach((p, state) -> {
+                    if (!state.plips) p.hideEntity(Mapix.getInstance(), display);
+                });
             });
         });
     }
