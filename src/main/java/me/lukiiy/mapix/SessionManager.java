@@ -5,8 +5,10 @@ import me.lukiiy.mapling.Position;
 import me.lukiiy.mapling.WorldData;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
@@ -140,6 +142,17 @@ public class SessionManager {
         }
 
         player.sendMessage(Component.text("Position " + (first ? "1" : "2") + " set! (" + loc.blockX() + " " + loc.blockY() + " " + loc.blockZ() + ")").color(first ? FIRST_POSITION : SECOND_POSITION));
+        if (state.selectionMode == SelectionMode.POINT) {
+            player.sendMessage(Component.text("[ Add to " + state.selectedGroup + " ]").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).clickEvent(ClickEvent.callback(aud -> {
+                if (!(aud instanceof Player p)) return;
+
+                var managedWorld = mapFor(player);
+                if (managedWorld == null) return;
+
+                addToGroup(managedWorld, state.selectedGroup, state.first);
+            })));
+        }
+
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, .25f, 1);
     }
 
