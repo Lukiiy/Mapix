@@ -117,23 +117,15 @@ public class Cmd { // TODO !!!
 
                             return Command.SINGLE_SUCCESS;
                         }))
-                .then(Commands.literal("info")
+                .then(Commands.literal("menu")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;
 
-                            SessionManager sessionManager = Mapix.getInstance().getSessionManager();
-                            var managedWorld = sessionManager.mapFor(player);
+                            var managedWorld = Mapix.getInstance().getSessionManager().mapFor(player);
+                            if (managedWorld == null) throw NOT_IN_SESSION;
 
-                            player.sendMessage(Component.text("Session: " + (managedWorld != null ? managedWorld.getId() : "none")).color(NamedTextColor.YELLOW));
-
-                            String group = sessionManager.getSelectedGroup(player);
-
-                            if (managedWorld != null) {
-                                player.sendMessage(Component.text("Groups: ").color(NamedTextColor.GREEN).append(Component.text(String.join(", ", sessionManager.getGroups(managedWorld)))));
-                                if (group != null && !group.isBlank()) player.sendMessage(Component.text("Selected group: ").color(NamedTextColor.GREEN).append(Component.text(group))); // TODO arrow
-                                player.sendMessage(Component.text("First position: ").color(NamedTextColor.BLUE).append(Component.text(formatLocation(sessionManager.getFirstPosition(player)))));
-                                player.sendMessage(Component.text("Second position: ").color(NamedTextColor.BLUE).append(Component.text(formatLocation(sessionManager.getSecondPosition(player)))));
-                            }
+                            player.sendMessage(Component.text("Opening menu!").color(NamedTextColor.AQUA));
+                            Dialogs.menu(player);
 
                             return Command.SINGLE_SUCCESS;
                         }))
@@ -147,7 +139,7 @@ public class Cmd { // TODO !!!
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> buildGroup() {
-        return Commands.literal("group")
+        return Commands.literal("group") // TODO - SelectionMode AREA
                 .then(Commands.literal("list")
                         .executes(it -> {
                             if (!(it.getSource().getSender() instanceof Player player)) throw NON_PLAYER;

@@ -1,11 +1,7 @@
 package me.lukiiy.mapix;
 
-import io.papermc.paper.event.player.PlayerCustomClickEvent;
-import me.lukiiy.mapling.Position;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +13,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class Listen implements Listener {
     @EventHandler
@@ -52,6 +46,13 @@ public class Listen implements Listener {
             if (e.getClickedBlock() == null) return;
             sessionManager.setPos(player, e.getClickedBlock().getLocation().toCenterLocation(), sessionManager.getState(player).selectionMode == SelectionMode.POINT || left);
 
+            return;
+        }
+
+        if (item.isSimilar(Item.MENU)) {
+            Dialogs.menu(player);
+
+            player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1, 1);
             return;
         }
     }
