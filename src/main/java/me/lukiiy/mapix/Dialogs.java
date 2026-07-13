@@ -35,7 +35,7 @@ public class Dialogs {
 
         // Selection
 
-        body.add(category("Selection"));
+        body.add(category("Selection", null));
 
         body.add(line("Mode", state.selectionMode.name()));
         body.add(line("Pos 1", "..."));
@@ -50,17 +50,13 @@ public class Dialogs {
 
         // Groups
 
-        body.add(category("Groups"));
-        body.add(description("The active group stores newly saved selections."));
-        body.add(line("Active Group", Optional.ofNullable(sessions.getSelectedGroup(player)).orElse("None")));
-        body.add(line("Selection Mode", state.selectionMode.name()));
-        body.add(line("Show Plips", state.plips ? "ON" : "OFF"));
+        body.add(category("Groups", "The active group stores newly saved selections."));
 
         body.add(spacer());
 
         // Session
 
-        body.add(category("Session"));
+        body.add(category("Session", null));
         body.add(actions(action("Save", NamedTextColor.GREEN, p -> sessions.save(world.getId()))));
 
         player.showDialog(Dialog.create(dialog -> dialog.empty()
@@ -71,8 +67,12 @@ public class Dialogs {
 
     // help
 
-    private static DialogBody category(String title) {
-        return DialogBody.plainMessage(Component.text(title, NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
+    private static DialogBody category(String title, String description) {
+        Component component = Component.empty().append(Component.text(title).color(NamedTextColor.AQUA).decorate(TextDecoration.BOLD));
+
+        if (description != null && !description.isEmpty()) component = component.appendNewline().append(Component.text(description).color(NamedTextColor.GRAY));
+
+        return DialogBody.plainMessage(component);
     }
 
     private static DialogBody description(String text) {
