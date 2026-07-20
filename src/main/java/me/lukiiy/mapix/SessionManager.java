@@ -16,8 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SessionManager {
     private static final TextColor FIRST_POSITION = TextColor.color(0x7874b7);
@@ -142,8 +140,12 @@ public class SessionManager {
         }
 
         player.sendMessage(Component.text("Position " + (first ? "1" : "2") + " set! (" + loc.blockX() + " " + loc.blockY() + " " + loc.blockZ() + ")").color(first ? FIRST_POSITION : SECOND_POSITION));
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, .25f, 1);
 
-        if (state.selectionMode == SelectionMode.POINT) {
+        boolean isPoint = state.selectionMode == SelectionMode.POINT;
+        boolean isValid = isPoint || (state.first != null && state.second != null);
+
+        if (state.selectedGroup != null && isValid) {
             player.sendMessage(Component.text("[ Add to " + state.selectedGroup + " ]").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).clickEvent(ClickEvent.callback(aud -> {
                 if (!(aud instanceof Player)) return;
 
@@ -153,8 +155,6 @@ public class SessionManager {
                 addToGroup(managedWorld, state.selectedGroup, state.first);
             })));
         }
-
-        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, .25f, 1);
     }
 
     public Location getFirstPosition(Player player) {
