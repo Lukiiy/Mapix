@@ -29,10 +29,9 @@ public class SessionManager {
     public void edit(String id, Player player) {
         Mapix mapix = Mapix.getInstance();
 
-        if (sessions.containsKey(id)) {
-            EditSession session = sessions.get(id);
-            if (session.world().getHandle() != null) enter(player, session);
-
+        EditSession existing = sessions.get(id);
+        if (existing != null) {
+            if (existing.world().getHandle() != null) enter(player, existing);
             return;
         }
 
@@ -53,11 +52,11 @@ public class SessionManager {
     }
 
     public void save(String id) {
-        var session = sessions.remove(id);
+        EditSession session = sessions.remove(id);
         if (session == null) return;
 
         var managedWorld = session.world();
-        var world = managedWorld.getHandle();
+        World world = managedWorld.getHandle();
 
         if (world != null) {
             Location fallback = Bukkit.getWorlds().getFirst().getSpawnLocation();
@@ -92,7 +91,7 @@ public class SessionManager {
 
     public EditSession sessionFor(Player player) {
         for (EditSession session : sessions.values()) {
-            var world = session.world().getHandle();
+            World world = session.world().getHandle();
 
             if (world != null && world.equals(player.getWorld())) return session;
         }
@@ -107,15 +106,16 @@ public class SessionManager {
     }
 
     private void enter(Player player, EditSession session) {
-        var world = session.world().getHandle();
-        if (world != null) player.teleport(world.getSpawnLocation());
+        World world = session.world().getHandle();
+        if (world == null) return;
 
+        player.teleport(world.getSpawnLocation());
         player.setGameMode(GameMode.CREATIVE);
         player.setFlying(true);
         player.showBossBar(session.bar());
 
         Item.applyAll(player.getInventory());
-        player.sendMessage(Component.text("Teleporting to session " + session.world().getHandle().getName()).color(NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Teleporting to session " + world.getName()).color(NamedTextColor.GREEN));
     }
 
     public void exit(Player player, boolean fullQuit) {
@@ -142,12 +142,13 @@ public class SessionManager {
         }
 
         player.sendMessage(Component.text("Position " + (first ? "1" : "2") + " set! (" + loc.blockX() + " " + loc.blockY() + " " + loc.blockZ() + ")").color(first ? FIRST_POSITION : SECOND_POSITION));
+
         if (state.selectionMode == SelectionMode.POINT) {
             player.sendMessage(Component.text("[ Add to " + state.selectedGroup + " ]").color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD).clickEvent(ClickEvent.callback(aud -> {
-                if (!(aud instanceof Player p)) return;
+                if (!(aud instanceof Player)) return;
 
                 var managedWorld = mapFor(player);
-                if (managedWorld == null) return;
+                if (managedWorld == null || state.selectedGroup == null) return;
 
                 addToGroup(managedWorld, state.selectedGroup, state.first);
             })));
