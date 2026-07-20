@@ -171,46 +171,43 @@ public class SessionManager {
         state.second = null;
     }
 
-    // Groups TODO TODO TODO - Ensure compatibility with data lib!
+    // Groups
 
-    public Set<String> getGroups(ManagedWorld<World> managedWorld) { // lol
-        WorldData section = managedWorld.getData().getSection("groups");
-
-        return section == null ? Collections.emptySet() : new LinkedHashSet<>(section.keys());
+    public Set<String> getGroups(ManagedWorld<World> managedWorld) {
+        return managedWorld.getData().groupKeys();
     }
 
     public List<Position> getGroupPositions(ManagedWorld<World> managedWorld, String group) {
-        var sec = managedWorld.getData().getSection("groups");
-        if (sec == null) return new ArrayList<>();
+        WorldData data = managedWorld.getData();
 
-        Object raw = sec.get(group);
-        if (!(raw instanceof List<?> list)) return new ArrayList<>();
+        if (!data.hasGroup(group)) return new ArrayList<>();
 
-        return list.stream().filter(Position.class::isInstance).map(Position.class::cast).collect(Collectors.toCollection(ArrayList::new));
+        return new ArrayList<>(data.group(group)); // clone
     }
 
     public boolean createGroup(ManagedWorld<World> managedWorld, String name) {
-        if (getGroups(managedWorld).contains(name)) return false;
+        WorldData data = managedWorld.getData();
 
-        managedWorld.getData().section("groups").set(name, new ArrayList<>());
+        if (data.hasGroup(name)) return false;
+        data.group(name);
+
         return true;
     }
 
     public boolean deleteGroup(ManagedWorld<World> managedWorld, String name) {
-        WorldData section = managedWorld.getData().getSection("groups");
-        if (section == null || !section.contains(name)) return false;
+        boolean removed = managedWorld.getData().removeGroup(name);
+        if (removed) reloadPlips(managedWorld);
 
-        section.remove(name);
-        return true;
+        return removed;
     }
 
     public String getSelectedGroup(Player player) {
-        var managedWorld = mapFor(player);
+        ManagedWorld<World> managedWorld = mapFor(player);
         if (managedWorld == null) return null;
 
         PlayerEditState state = getState(player);
         if (state.selectedGroup == null) {
-            var groups = getGroups(managedWorld);
+            Set<String> groups = getGroups(managedWorld);
 
             if (!groups.isEmpty()) state.selectedGroup = groups.iterator().next();
         }
@@ -223,7 +220,7 @@ public class SessionManager {
     }
 
     public String scrollGroup(Player player, int delta) {
-        var managedWorld = mapFor(player);
+        ManagedWorld<World> managedWorld = mapFor(player);
         if (managedWorld == null) return null;
 
         List<String> keys = new ArrayList<>(getGroups(managedWorld));
@@ -237,23 +234,23 @@ public class SessionManager {
     }
 
     public boolean addToGroup(ManagedWorld<World> managedWorld, String group, Location loc) {
-        if (!getGroups(managedWorld).contains(group)) return false;
+        WorldData data = managedWorld.getData();
+        if (!data.hasGroup(group)) return false;
 
-        List<Position> positions = getGroupPositions(managedWorld, group);
-
-        positions.add(Utils.toPos(loc));
-        managedWorld.getData().section("groups").set(group, positions);
+        data.group(group).add(Utils.toPos(loc));
         reloadPlips(managedWorld);
 
         return true;
     }
 
     public boolean removeFromGroup(ManagedWorld<World> managedWorld, String group, int index) {
-        List<Position> positions = getGroupPositions(managedWorld, group);
+        WorldData data = managedWorld.getData();
+        if (!data.hasGroup(group)) return false;
+
+        List<Position> positions = data.group(group);
         if (index < 0 || index >= positions.size()) return false;
 
         positions.remove(index);
-        managedWorld.getData().section("groups").set(group, positions);
         reloadPlips(managedWorld);
 
         return true;
@@ -292,33 +289,32 @@ public class SessionManager {
 
         state.plips = !state.plips;
 
-        var managedWorld = mapFor(player);
+        ManagedWorld<World> managedWorld = mapFor(player);
         if (managedWorld == null) return;
 
-        World world = managedWorld.getHandle();
-        if (world == null) return;
-
-        sessions.values().stream().filter(s -> s.world() == managedWorld).findFirst().ifPresent(session -> session.plips().forEach(textDisplay -> {
-            if (state.plips) player.showEntity(Mapix.getInstance(), textDisplay); else player.hideEntity(Mapix.getInstance(), textDisplay);
+        sessions.values().stream().filter(s -> s.world() == managedWorld).findFirst().ifPresent(session -> session.plips().forEach(display -> {
+            if (state.plips) player.showEntity(Mapix.getInstance(), display); else player.hideEntity(Mapix.getInstance(), display);
         }));
     }
 
     // the cool thing :3
     private void spawnPlips(EditSession session) {
-        var world = session.world().getHandle();
+        World world = session.world().getHandle();
         if (world == null) return;
 
-        getGroups(session.world()).forEach(group -> {
-            List<Position> positions = getGroupPositions(session.world(), group);
+        WorldData data = session.world().getData();
 
-            IntStream.range(0, positions.size()).forEach(i -> {
+        for (String group : data.groupKeys()) {
+            List<Position> positions = data.group(group);
+
+            for (int i = 0; i < positions.size(); i++) {
                 Location base = Utils.toLoc(world, positions.get(i));
                 boolean blocked = !base.getBlock().isPassable();
 
                 Component text = Component.text(group).color(NamedTextColor.WHITE).appendSpace().append(Component.text("[" + i + "]").color(NamedTextColor.YELLOW));
                 if (blocked) text = text.append(Component.newline()).append(Component.text("↓").color(NamedTextColor.GRAY));
 
-                final Component fText = text;
+                Component fText = text;
                 TextDisplay display = world.spawn(blocked ? base.clone().add(0, 1, 0) : base, TextDisplay.class, e -> {
                     e.text(fText);
                     e.setPersistent(false);
@@ -334,8 +330,8 @@ public class SessionManager {
                 playerState.forEach((p, state) -> {
                     if (!state.plips) p.hideEntity(Mapix.getInstance(), display);
                 });
-            });
-        });
+            }
+        }
     }
 
     private void removePlips(EditSession session) {
