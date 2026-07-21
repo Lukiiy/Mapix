@@ -10,10 +10,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -313,10 +314,16 @@ public class SessionManager {
                 boolean blocked = !base.getBlock().isPassable();
 
                 Component text = Component.text(group).color(NamedTextColor.WHITE).appendSpace().append(Component.text("[" + i + "]").color(NamedTextColor.YELLOW));
-                if (blocked) text = text.append(Component.newline()).append(Component.text("↓").color(NamedTextColor.GRAY));
+
+                if (blocked) world.spawn(base, BlockDisplay.class, e -> {
+                    e.setBlock(Material.NOTE_BLOCK.createBlockData());
+                    e.setPersistent(false);
+                    e.setViewRange(.25f);
+                    e.setTransformation(new Transformation(new Vector3f(-.125f), new Quaternionf(), new Vector3f(.25f), new Quaternionf()));
+                });
 
                 Component fText = text;
-                TextDisplay display = world.spawn(blocked ? base.clone().add(0, 1, 0) : base, TextDisplay.class, e -> {
+                TextDisplay display = world.spawn(blocked ? base.clone().add(0, 0.75, 0) : base, TextDisplay.class, e -> {
                     e.text(fText);
                     e.setPersistent(false);
                     e.setDefaultBackground(false);
